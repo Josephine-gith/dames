@@ -12,16 +12,16 @@ RAYON = 20
 
 # état initial du jeu
 
-Damier = {}
+Cases = {}
 for i in range(NB_PIXELS):
     for j in range(NB_PIXELS):
         if (i+j)%2==1:
             if j in range(4):
-                Damier[(i,j)] = BLACK
+                Cases[(i,j)] = BLACK
             elif j in range(6,NB_PIXELS):
-                Damier[(i,j)] = WHITE
+                Cases[(i,j)] = WHITE
             else :
-                Damier[(i,j)] = None
+                Cases[(i,j)] = None
 
 # sous-fonctions utiles
 def draw_damier():
@@ -32,10 +32,10 @@ def draw_damier():
                 rect = pg.Rect(i*T_PIXELS, j*T_PIXELS, T_PIXELS, T_PIXELS)
                 pg.draw.rect(screen, BEIGE, rect)
 
-def draw_pieces(Damier):
-    for coord in Damier.keys():
-        if Damier[coord]!= None :
-            pg.draw.circle(screen, Damier[coord], (coord[0]*T_PIXELS+25,coord[1]*T_PIXELS+25), RAYON)
+def draw_pieces():
+    for coord in Cases.keys():
+        if Cases[coord]!= None :
+            pg.draw.circle(screen, Cases[coord], (coord[0]*T_PIXELS+25,coord[1]*T_PIXELS+25), RAYON)
 
 '''
 def handle_event(event, running, direction):
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     while running:
         clock.tick(1)
         draw_damier()
-        draw_pieces(Damier)
+        draw_pieces()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
