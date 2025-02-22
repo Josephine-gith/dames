@@ -22,7 +22,8 @@ for i in range(NB_PIXELS):
             else:
                 Cases[(i, j)] = None
 
-# Fonctions utiles
+
+# Fonctions d'affichage
 def draw_damier():
     screen.fill(MARRON)
     for i in range(NB_PIXELS):
@@ -31,23 +32,41 @@ def draw_damier():
                 rect = pg.Rect(i * T_PIXELS, j * T_PIXELS, T_PIXELS, T_PIXELS)
                 pg.draw.rect(screen, BEIGE, rect)
 
+
 def draw_pieces():
     for coord in Cases.keys():
         if Cases[coord]:
-            pg.draw.circle(screen, Cases[coord], (coord[0] * T_PIXELS + 25, coord[1] * T_PIXELS + 25), RAYON)
+            pg.draw.circle(
+                screen,
+                Cases[coord],
+                (coord[0] * T_PIXELS + 25, coord[1] * T_PIXELS + 25),
+                RAYON,
+            )
+
 
 def update_plateau(plateau, coord_i, coord_f):
+    if legit_move(plateau, coord_i, coord_f):
         couleur = plateau[coord_i]
         plateau[coord_i] = None
         plateau[coord_f] = couleur
+
 
 def get_coordinates():
     print("Cliquez sur une case pour sélectionner une pièce.")
     while True:
         for event in pg.event.get():
-            if event.type == pg.MOUSEBUTTONDOWN:
+            if event.type == pg.QUIT:
+                pg.quit()
+                exit()
+            elif event.type == pg.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 return (x // T_PIXELS, y // T_PIXELS)
+
+
+# Règles de déplacement
+def legit_move(plateau, coord_i, coord_f):
+    pass
+
 
 # Boucle principale
 if __name__ == "__main__":
@@ -63,6 +82,13 @@ if __name__ == "__main__":
     while running:
         clock.tick(10)
 
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                running = False
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_q:
+                    running = False
+
         print("Sélectionnez la pièce à déplacer.")
         coord_i = get_coordinates()
         print("Sélectionnez la case de destination.")
@@ -70,15 +96,9 @@ if __name__ == "__main__":
 
         if coord_i in Cases and Cases[coord_i] is not None:
             update_plateau(Cases, coord_i, coord_f)
-        
+
         draw_damier()
         draw_pieces()
         pg.display.update()
 
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
-            elif event.type == pg.KEYDOWN and event.key == pg.K_q:
-                running = False
-        
     pg.quit()
