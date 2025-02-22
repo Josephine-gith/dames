@@ -1,4 +1,5 @@
 import pygame as pg
+import keyboard
 
 # constantes utiles
 NB_PIXELS =10
@@ -63,6 +64,25 @@ def game_over(snake, running):
         running = False
     return running
 '''
+def update_plateau(plateau, coord_i, coord_f):
+    couleur = plateau[coord_i]
+    plateau[coord_i] = None
+    plateau[coord_f] = couleur
+
+def get_coordinates():
+    print("Appuyez sur une touche pour X puis faire entrer")
+    keyboard.wait("enter")
+    x = keyboard.read_event().name
+    
+    print("Appuyez sur une touche pour Y puis faire entrer")
+    keyboard.wait("enter")
+    y = keyboard.read_event().name
+    
+    return (x, y)
+
+coords = get_coordinates()
+print("Coordonnées saisies :", coords)
+
 
 if __name__ == "__main__":
     #initialisation de l'écran
@@ -70,9 +90,20 @@ if __name__ == "__main__":
     screen = pg.display.set_mode((T_ECRAN, T_ECRAN))
     clock = pg.time.Clock()
 
+    draw_damier()
+    draw_pieces()   
+
     running = True
     while running:
         clock.tick(1)
+
+        # update le plateau :
+        print("Entrer les coordonnées de la pièce à déplacer")
+        coord_i = get_coordinates()
+        print("Entrer les coordonnées de sa nouvelle position")
+        coord_f = get_coordinates()
+
+        update_plateau(Cases,coord_i,coord_f)
 
         draw_damier()
         draw_pieces()
