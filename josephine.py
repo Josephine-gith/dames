@@ -56,12 +56,6 @@ def handle_event(event, running, direction):
             direction=Cell(x=1,y=0)
     return running, direction
 
-def move_snake(snake, direction):
-    for i in range(1,len(snake)):
-        snake[-i]=snake[-i-1]
-    snake[0]=Cell(x=snake[0][0]+direction[0],y=snake[0][1]+direction[1])
-    return snake
-
 def game_over(snake, running):
     if snake[-1] in list(snake)[:-2]:
         running = False
@@ -79,8 +73,10 @@ if __name__ == "__main__":
     running = True
     while running:
         clock.tick(1)
+
         draw_damier()
         draw_pieces()
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
@@ -88,6 +84,7 @@ if __name__ == "__main__":
             # si la touche est "Q" on veut quitter le programme
                 if event.key == pg.K_q:
                     running = False 
+        
         pg.display.update()
 
     pg.quit()
