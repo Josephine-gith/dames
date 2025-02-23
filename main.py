@@ -45,13 +45,15 @@ def draw_pieces():
 
 
 def update_plateau(plateau, coord_i, coord_f):
-    couleur = plateau[coord_i]
-    plateau[coord_i] = None
-    plateau[coord_f] = couleur
+    if legit_move(plateau, coord_i, coord_f):
+        couleur = plateau[coord_i]
+        plateau[coord_i] = None
+        plateau[coord_f] = couleur
+    else:
+        None
 
 
 def get_coordinates():
-    print("Cliquez sur une case pour sélectionner une pièce.")
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -62,13 +64,83 @@ def get_coordinates():
                 return (x // T_PIXELS, y // T_PIXELS)
 
 
+# Règles de déplacement
+def legit_move(plateau, coord_i, coord_f):
+    global tour
+    couleur = plateau[coord_i]
+    if plateau[coord_f] is None and ((coord_f[0] + coord_f[1]) % 2) == 1:
+        if couleur == WHITE and tour % 2 == 0:
+            if (coord_f[1] - coord_i[1]) == -1 and abs(coord_f[0] - coord_i[0]) == 1:
+                tour += 1
+                return True
+            elif (
+                abs(coord_f[1] - coord_i[1]) == 2 and abs(coord_f[0] - coord_i[0]) == 2
+            ):
+                if (
+                    plateau[
+                        (coord_f[0] + coord_i[0]) / 2, (coord_f[1] + coord_i[1]) / 2
+                    ]
+                    == BLACK
+                ):
+                    plateau[
+                        (coord_f[0] + coord_i[0]) / 2, (coord_f[1] + coord_i[1]) / 2
+                    ] = None
+                    return True
+            else:
+                return False
+        if couleur == BLACK and tour % 2 == 1:
+            if (coord_i[1] - coord_f[1]) == -1 and abs(coord_f[0] - coord_i[0]) == 1:
+                tour += 1
+                return True
+            elif (
+                abs(coord_f[1] - coord_i[1]) == 2 and abs(coord_f[0] - coord_i[0]) == 2
+            ):
+                if (
+                    plateau[
+                        (coord_f[0] + coord_i[0]) / 2, (coord_f[1] + coord_i[1]) / 2
+                    ]
+                    == WHITE
+                ):
+                    plateau[
+                        (coord_f[0] + coord_i[0]) / 2, (coord_f[1] + coord_i[1]) / 2
+                    ] = None
+                    return True
+            else:
+                return False
+    else:
+        return False
+
+
+def joueur(tour):
+    if tour % 2 == 0:
+        return "Blancs"
+    else:
+        return "Noirs"
+
+
+def end_game(plateau, running):
+    w, b = 0, 0
+    for k in plateau.keys():
+        if Cases[k] == BLACK:
+            b = b + 1
+        elif Cases[k] == WHITE:
+            w = w + 1
+    if w == 0:
+        print("Les Noirs ont gagné.")
+        running = False
+    elif b == 0:
+        print("Les Blancs ont gagné.")
+        running = False
+    return running
+
+
 # Boucle principale
 if __name__ == "__main__":
     pg.init()
     screen = pg.display.set_mode((T_ECRAN, T_ECRAN))
     clock = pg.time.Clock()
     running = True
-
+    tour = 0
     draw_damier()
     draw_pieces()
     pg.display.update()
@@ -83,16 +155,22 @@ if __name__ == "__main__":
                 if event.key == pg.K_q:
                     running = False
 
+        print(f"C'est aux {joueur(tour)} de jouer.")
         print("Sélectionnez la pièce à déplacer.")
         coord_i = get_coordinates()
         print("Sélectionnez la case de destination.")
         coord_f = get_coordinates()
 
-        if coord_i in Cases and Cases[coord_i] is not None:
+        if coord_i not in Cases or coord_f not in Cases:
+            print("Coordonnées invalides.")
+            continue
+        else:
             update_plateau(Cases, coord_i, coord_f)
 
         draw_damier()
         draw_pieces()
         pg.display.update()
+
+        running = end_game(Cases,running)
 
     pg.quit()
